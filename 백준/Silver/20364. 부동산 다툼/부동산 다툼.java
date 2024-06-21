@@ -45,20 +45,20 @@ class Solution {
 
     public int search(int landNumber) {
         int index = landNumber;
-        LinkedList<Integer> list = new LinkedList<>();
+        int result = 0;
 
         while (index > 0) {
-            list.addFirst(index);
+            if (lands[index]) {
+                result = index;
+            }
+
             index /= 2;
         }
 
-        for (Integer i : list) {
-            if (lands[i]) {
-                return i;
-            }
+        if (result == 0) {
+            lands[landNumber] = true;
         }
 
-        lands[landNumber] = true;
-        return 0;
+        return result;
     }
 }
