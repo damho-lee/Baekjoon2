@@ -17,8 +17,8 @@ public class Main {
             grid = new int[n][m];
 
             if (target != 0) {
-                int x = target / m;
-                int y = target % m - 1;
+                int x = (target - 1) / m;
+                int y = (target - 1) % m;
                 circle = new Point(x, y);
             }
         } catch (IOException e) {
@@ -26,47 +26,31 @@ public class Main {
         }
     }
 
+    private static int calculatePaths(int startX, int startY, int endX, int endY) {
+        int[][] dp = new int[endX - startX + 1][endY - startY + 1];
+        dp[0][0] = 1;
+
+        for (int i = 0; i <= endX - startX; i++) {
+            for (int j = 0; j <= endY - startY; j++) {
+                if (i > 0) {
+                    dp[i][j] += dp[i - 1][j];
+                }
+                if (j > 0) {
+                    dp[i][j] += dp[i][j - 1];
+                }
+            }
+        }
+
+        return dp[endX - startX][endY - startY];
+    }
+
     private static int calculate() {
-        for (int i = 0; i < grid.length; i++) {
-            grid[i][0] = 1;
-        }
-
-        for (int i = 0; i < grid[0].length; i++) {
-            grid[0][i] = 1;
-        }
-
         if (circle == null) {
-            for (int i = 1; i < grid.length; i++) {
-                for (int j = 1; j < grid[i].length; j++) {
-                    grid[i][j] = grid[i - 1][j] + grid[i][j - 1];
-                }
-            }
-
-            return grid[grid.length - 1][grid[0].length - 1];
+            return calculatePaths(0, 0, grid.length - 1, grid[0].length - 1);
         } else {
-            for (int i = 1; i <= circle.getX(); i++) {
-                for (int j = 1; j <= circle.getY(); j++) {
-                    grid[i][j] = grid[i - 1][j] + grid[i][j - 1];
-                }
-            }
-
-            int result = grid[circle.getX()][circle.getY()];
-
-            for (int i = circle.getX(); i < grid.length; i++) {
-                grid[i][circle.getY()] = 1;
-            }
-
-            for (int i = circle.getY(); i < grid[0].length; i++) {
-                grid[circle.getX()][i] = 1;
-            }
-
-            for (int i = circle.getX() + 1; i < grid.length; i++) {
-                for (int j = circle.getY() + 1; j < grid[i].length; j++) {
-                    grid[i][j] = grid[i - 1][j] + grid[i][j - 1];
-                }
-            }
-            
-            return result * grid[grid.length - 1][grid[0].length - 1];
+            int part1 = calculatePaths(0, 0, circle.getX(), circle.getY());
+            int part2 = calculatePaths(circle.getX(), circle.getY(), grid.length - 1, grid[0].length - 1);
+            return part1 * part2;
         }
     }
 
@@ -77,8 +61,8 @@ public class Main {
 }
 
 class Point {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     public Point(int x, int y) {
         this.x = x;
