@@ -1,69 +1,45 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            String[] inputs = reader.readLine().split(" ");
+            int n = Integer.parseInt(inputs[0]);
+            int m = Integer.parseInt(inputs[1]);
+            List<String> nList = new ArrayList<>();
 
-        String inputString = scanner.nextLine();
-        InOutResolver inOutResolver = new InOutResolver(inputString);
-
-        int n = inOutResolver.getN();
-        int m = inOutResolver.getM();
-        int count = 0;
-
-        List<String> nList = new ArrayList<>();
-        List<String> mList = new ArrayList<>();
-
-        for (int i = 0; i < n; i++) {
-            nList.add(scanner.nextLine().trim());
-        }
-        for (int i = 0; i < m; i++) {
-            mList.add(scanner.nextLine().trim());
-        }
-
-        for (int i = 0; i < m; i++) {
-            if (nList.contains(mList.get(i))) {
-                count++;
+            for (int i = 0; i < n; i++) {
+                nList.add(reader.readLine().trim());
             }
-        }
+            nList.sort(String::compareTo);
 
-        System.out.println(count);
-    }
+            String input;
+            int count = 0;
+            for (int i = 0; i < m; i++) {
+                input = reader.readLine().trim();
+                int l = 0;
+                int r = n - 1;
+                String current;
 
-    static class InOutResolver {
-        private int n;
-        private int m;
-        public InOutResolver(String inputString) {
-            if (inputString == null) {
-                throw new IllegalArgumentException("입력이 null일 수 없습니다.");
+                while (l <= r) {
+                    int mid = (l + r) / 2;
+                    current = nList.get(mid);
+                    if (input.compareTo(current) > 0) {
+                        l = mid + 1;
+                    } else if (input.compareTo(current) < 0) {
+                        r = mid - 1;
+                    } else {
+                        count++;
+                        break;
+                    }
+                }
             }
 
-            StringTokenizer st = new StringTokenizer(inputString, " ");
-            if (st.countTokens() != 2) {
-                throw new IllegalArgumentException("입력이 정수 2개가 아닙니다.");
-            }
-
-            n = Integer.parseInt(st.nextToken());
-            m = Integer.parseInt(st.nextToken());
-
-            classInvariant();
-        }
-
-        private void classInvariant() {
-            if (this.n < 0 || this.m < 0) {
-                throw new IllegalArgumentException("class invariant!! n : " + n + ", m : " + m);
-            }
-        }
-
-        public int getN() {
-            return n;
-        }
-
-        public int getM() {
-            return m;
+            System.out.println(count);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
