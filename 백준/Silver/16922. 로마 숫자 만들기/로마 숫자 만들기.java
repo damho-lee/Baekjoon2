@@ -1,12 +1,8 @@
-import java.awt.*;
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
-    private static final int ARRAY_SIZE = 5;
-
     public static void main(String[] args) {
         int n;
 
