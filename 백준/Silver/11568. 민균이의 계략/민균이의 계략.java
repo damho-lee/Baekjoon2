@@ -24,18 +24,36 @@ class Solution {
 
     public static int solve(int[] inputs) {
         int[] numbers = inputs.clone();
-        int[] length = new int[numbers.length];
-        Arrays.fill(length, 1);
-        int max = 0;
+        int[] array = new int[numbers.length];
+        array[0] = numbers[0];
+        int length = 0;
 
         for (int i = 1; i < numbers.length; i++) {
-            for (int j = 0; j < i; j++) {
-                if (numbers[i] > numbers[j]) {
-                    length[i] = Math.max(length[i], length[j] + 1);
-                }
+            if (array[length] < numbers[i]) {
+                array[length + 1] = numbers[i];
+                length++;
+            } else {
+                int newIndex = binarySearch(0, length, numbers[i], array);
+                array[newIndex] = numbers[i];
             }
         }
 
-        return Arrays.stream(length).max().orElse(1);
+        return length + 1;
+    }
+
+    private static int binarySearch(int left, int right, int target, int[] array) {
+        int mid;
+
+        while (left < right) {
+            mid = (left + right) / 2;
+
+            if (array[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        return right;
     }
 }
