@@ -29,9 +29,9 @@ public class Main {
         dp[2] = 3;
         int tmp = 0;
 
-        for (int i = 4; i < dp.length; i += 2) {
-            dp[i] = dp[i - 2] * 3 + 2 + tmp * 2;
-            tmp += dp[i - 2];
+        for (int i = 4; i <= dp.length; i += 2) {
+            tmp += dp[i - 4] * 2;
+            dp[i] = dp[i - 2] * 3 + tmp;
         }
 
         return dp[n];
