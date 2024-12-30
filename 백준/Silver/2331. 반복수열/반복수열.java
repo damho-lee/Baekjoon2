@@ -12,17 +12,19 @@ public class Main {
 
             List<Integer> list = new ArrayList<>();
             list.add(a);
-            int past;
+            int pastValue = a;
+            int calculatedValue;
 
             while (true) {
-                past = calculate(list.get(list.size() - 1), p);
+                calculatedValue = calculate(pastValue, p);
 
-                if (list.contains(past)) {
-                    System.out.println(list.indexOf(past));
+                if (list.contains(calculatedValue)) {
+                    System.out.println(list.indexOf(calculatedValue));
                     return;
                 }
 
-                list.add(past);
+                list.add(calculatedValue);
+                pastValue = calculatedValue;
             }
         } catch (IOException e) {
             e.printStackTrace();
