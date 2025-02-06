@@ -1,33 +1,48 @@
 import java.io.*;
-import java.util.*;
 
-public class Main{
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st;
-        String input="";
-        while((input= br.readLine()) != null){
-            st=new StringTokenizer(input);
-            int total=0;
-            int start=Integer.parseInt(st.nextToken());
-            int end=Integer.parseInt(st.nextToken());
-            int[] num;
-            for(int i=start; i<=end; i++){
-                String a=String.valueOf(i);
-                num=new int[10];
-                for(int j=0; j<a.length(); j++){
-                    num[a.charAt(j)-'0']++;
-                    if(num[a.charAt(j)-'0']>1){
-                        break;
-                    }
-                    else if(j==a.length()-1){
-                        total++;
+public class Main {
+    public static void main(String[] args) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out))) {
+            String[] inputs;
+            String input;
+
+            while ((input = reader.readLine()) != null && !input.isEmpty()) {
+                inputs = input.split(" ");
+                int n = Integer.parseInt(inputs[0]);
+                int m = Integer.parseInt(inputs[1]);
+                int count = 0;
+
+                for (int roomNumber = n; roomNumber <= m; roomNumber++) {
+                    char[] numbers = String.valueOf(roomNumber).toCharArray();
+
+                    if (isValid(numbers)) {
+                        count++;
                     }
                 }
+
+                writer.write(count + "\n");
             }
-            bw.write(total+"\n");
-            bw.flush();
+
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private static boolean isValid(char[] array) {
+        boolean[] isDuplicated = new boolean[10];
+        int number;
+
+        for (char ch : array) {
+            number = ch - '0';
+            if (isDuplicated[number]) {
+                return false;
+            }
+
+            isDuplicated[number] = true;
+        }
+
+        return true;
     }
 }
