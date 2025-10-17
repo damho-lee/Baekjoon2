@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             ProductRepository repository = new ConsoleProductRepository();
-            KnapsackSolver solver = new KnapsackSolver();
+            KnapsackSolver solver = new KnapsackSolverWithOneDimensionalArrangement();
 
             ProblemInput input = repository.readInput();
             int result = solver.solve(input);
@@ -79,8 +79,35 @@ class ConsoleProductRepository implements ProductRepository {
     }
 }
 
-class KnapsackSolver {
+interface KnapsackSolver {
+    int solve(ProblemInput input);
+}
 
+class KnapsackSolverWithOneDimensionalArrangement implements KnapsackSolver {
+
+    @Override
+    public int solve(ProblemInput input) {
+        List<Product> products = input.getProducts();
+        int numberOfProducts = products.size();
+        int maxWeight = input.getMaxWeight();
+        int[] dp = new int[maxWeight + 1];
+
+        for (Product product : products) {
+            int weight = product.getWeight();
+            int value = product.getValue();
+
+            for (int w = maxWeight; w >= weight; w--) {
+                dp[w] = Math.max(dp[w], dp[w - weight] + value);
+            }
+        }
+
+        return dp[maxWeight];
+    }
+}
+
+class KnapsackSolverWithTwoDimensionalArrangement implements KnapsackSolver {
+
+    @Override
     public int solve(ProblemInput input) {
         List<Product> products = input.getProducts();
         int numberOfProducts = products.size();
