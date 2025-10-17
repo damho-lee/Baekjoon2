@@ -1,69 +1,26 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    private static List<Product> products;
-    private static int n;
-    private static int k;
-
-    private static void readInput() {
-        products = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            String[] inputs = reader.readLine().trim().split(" ");
-            n = Integer.parseInt(inputs[0].trim());
-            k = Integer.parseInt(inputs[1].trim());
-
-            for (int i = 0; i < n; i++) {
-                inputs = reader.readLine().trim().split(" ");
-                products.add(new Product(Integer.parseInt(inputs[0].trim()), Integer.parseInt(inputs[1].trim())));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static int calculate() {
-        int[][] array = new int[n + 1][k + 1];
-
-        for (int i = 0; i < n + 1; i++) {
-            array[i][0] = 0;
-        }
-
-        for (int i = 0; i < k + 1; i++) {
-            array[0][i] = 0;
-        }
-
-        for (int i = 1; i < n + 1; i++) {
-            Product current = products.get(i - 1);
-
-            for (int j = 1; j < k + 1; j++) {
-                if (current.getWeight() <= j) {
-                    array[i][j] = Math.max(array[i - 1][j - current.getWeight()] + current.getValue(), array[i - 1][j]);
-                } else {
-                    array[i][j] = array[i - 1][j];
-                }
-            }
-        }
-        
-        return array[n][k];
-    }
-
-    private static void run() {
-        readInput();
-        System.out.println(calculate());
-    }
-
     public static void main(String[] args) {
-        run();
+        try {
+            ProductRepository repository = new ConsoleProductRepository();
+            KnapsackSolver solver = new KnapsackSolver();
+
+            ProblemInput input = repository.readInput();
+            int result = solver.solve(input);
+
+            System.out.println(result);
+        } catch (IOException e) {
+            throw new RuntimeException("입력 처리 중 오류가 발생했습니다.", e);
+        }
     }
 }
 
 class Product {
-    private int weight;
-    private int value;
+    private final int weight;
+    private final int value;
 
     public Product(int weight, int value) {
         this.weight = weight;
@@ -76,5 +33,74 @@ class Product {
 
     public int getValue() {
         return value;
+    }
+}
+
+class ProblemInput {
+    private final List<Product> products;
+    private final int maxWeight;
+
+    public ProblemInput(List<Product> products, int maxWeight) {
+        this.products = products;
+        this.maxWeight = maxWeight;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public int getMaxWeight() {
+        return maxWeight;
+    }
+}
+
+interface ProductRepository {
+    ProblemInput readInput() throws IOException;
+}
+
+class ConsoleProductRepository implements ProductRepository {
+
+    @Override
+    public ProblemInput readInput() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String[] firstLine = reader.readLine().split(" ");
+        int numberOfProducts = Integer.parseInt(firstLine[0]);
+        int maxWeight = Integer.parseInt(firstLine[1]);
+
+        List<Product> products = new ArrayList<>();
+        for (int i = 0; i < numberOfProducts; i++) {
+            String[] line = reader.readLine().split(" ");
+            int weight = Integer.parseInt(line[0]);
+            int value = Integer.parseInt(line[1]);
+            products.add(new Product(weight, value));
+        }
+
+        return new ProblemInput(products, maxWeight);
+    }
+}
+
+class KnapsackSolver {
+
+    public int solve(ProblemInput input) {
+        List<Product> products = input.getProducts();
+        int numberOfProducts = products.size();
+        int maxWeight = input.getMaxWeight();
+
+        int[][] dp = new int[numberOfProducts][maxWeight + 1];
+
+        Product firstProduct = products.get(0);
+        for (int w = firstProduct.getWeight(); w <= maxWeight; w++) {
+            dp[0][w] = firstProduct.getValue();
+        }
+
+        for (int i = 1; i < numberOfProducts; i++) {
+            Product current = products.get(i);
+
+            for (int j = 0; j <= maxWeight; j++) {
+                dp[i][j] = j < current.getWeight() ? dp[i - 1][j] : Math.max(dp[i - 1][j], dp[i - 1][j - current.getWeight()] + current.getValue());
+            }
+        }
+
+        return dp[numberOfProducts - 1][maxWeight];
     }
 }
